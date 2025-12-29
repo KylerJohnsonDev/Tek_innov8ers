@@ -1,27 +1,40 @@
-import { PrismaClient } from "@prisma/client";
+import { prismaClient } from "@/lib/db";
 
-const prisma = new PrismaClient();
+
 
 async function main() {
+
   // Create demo user
-  const user = await prisma.user.upsert({
-    where: { id: "demo-user-id" },
+  const userOne = await prismaClient.user.upsert({
+    where: { id: "demo-user-john-doe" },
     update: {},
     create: {
-      id: "demo-user-id",
-      email: "demo@taskify.com",
-      name: "Demo User",
+      id: "demo-user-john-doe",
+      email: "john.doe@taskify.com",
+      name: "John Doe",
     },
   });
 
-  console.log("Created user:", user);
+  console.log(`Demo user (${userOne.name}) created`, userOne);
+
+  const userTwo = await prismaClient.user.upsert({
+    where: { id: "demo-user-jane-doe" },
+    update: {},
+    create: {
+      id: "demo-user-jane-doe",
+      email: "jane.doe@taskify.com",
+      name: "Jane Doe",
+    },
+  });
+
+  console.log(`Demo user (${userTwo.name}) created`, userTwo);
 
   // Create demo projects with tasks
-  const project1 = await prisma.project.create({
+  const project1 = await prismaClient.project.create({
     data: {
       title: "Website Redesign",
       description: "Complete overhaul of company website with modern design",
-      userId: user.id,
+      userId: userOne.id,
       tasks: {
         create: [
           {
@@ -44,11 +57,11 @@ async function main() {
     },
   });
 
-  const project2 = await prisma.project.create({
+  const project2 = await prismaClient.project.create({
     data: {
       title: "Mobile App Development",
       description: "Build cross-platform mobile application using React Native",
-      userId: user.id,
+      userId: userOne.id,
       tasks: {
         create: [
           {
@@ -76,11 +89,11 @@ async function main() {
     },
   });
 
-  const project3 = await prisma.project.create({
+  const project3 = await prismaClient.project.create({
     data: {
       title: "Documentation Update",
       description: "Update all technical documentation for Q4",
-      userId: user.id,
+      userId: userTwo.id,
       tasks: {
         create: [
           {
@@ -103,10 +116,10 @@ async function main() {
 
 main()
   .then(async () => {
-    await prisma.$disconnect();
+    await prismaClient.$disconnect();
   })
   .catch(async (e) => {
     console.error(e);
-    await prisma.$disconnect();
+    await prismaClient.$disconnect();
     process.exit(1);
   });

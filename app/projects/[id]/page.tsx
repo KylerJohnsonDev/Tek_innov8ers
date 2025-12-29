@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { getProjectById } from "@/lib/services";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,16 +6,31 @@ import { Button } from "@/components/ui/button";
 import { CreateTaskDialog } from "@/components/create-task-dialog";
 import { TaskFilter } from "@/components/task-filter";
 import { ArrowLeft, Calendar, Clock } from "lucide-react";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 interface ProjectPageProps {
   params: Promise<{ id: string }>;
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/sign-in");
+  }
+
   const { id } = await params;
   const project = await getProjectById(id);
 
   if (!project) {
+    notFound();
+  }
+
+  // Check if the project belongs to the current user
+  if (project.userId !== session.user.id) {
     notFound();
   }
 

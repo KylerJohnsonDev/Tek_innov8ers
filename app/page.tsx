@@ -1,12 +1,20 @@
 import { getAllProjects } from "@/lib/services";
 import { CreateProjectDialog } from "@/components/create-project-dialog";
 import { ProjectCard } from "@/components/project-card";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
-  // For demo purposes, using a hardcoded userId
-  // In production, you'd get this from the session
-  const userId = "demo-user-id";
-  
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/sign-in");
+  }
+
+  const userId = session.user.id;
   const projects = await getAllProjects(userId);
 
   return (

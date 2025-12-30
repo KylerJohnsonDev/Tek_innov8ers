@@ -2,6 +2,9 @@ import { prismaClient } from "../lib/db";
 import { auth } from "../lib/auth";
 
 async function main() {
+
+  await prismaClient.session.deleteMany();
+
   // Create demo user using better-auth's API (handles password hashing correctly)
   const signUpJohnDoeResult = await auth.api.signUpEmail({
     body: {

@@ -4,6 +4,7 @@ import { getProjectById } from "@/lib/services";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CreateTaskDialog } from "@/components/create-task-dialog";
+import { EditProjectDialog } from "@/components/edit-project-dialog";
 import { TaskFilter } from "@/components/task-filter";
 import { ArrowLeft, Calendar, Clock } from "lucide-react";
 import { auth } from "@/lib/auth";
@@ -66,6 +67,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   {project.description || "No description provided"}
                 </CardDescription>
               </div>
+              <EditProjectDialog project={project} />
             </div>
           </CardHeader>
           <CardContent>

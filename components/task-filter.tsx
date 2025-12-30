@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { TaskStatus } from "@prisma/client";
 import { Task } from "@/lib/services";
 import { TaskList } from "@/components/task-list";
 import {
@@ -13,14 +14,15 @@ import {
 
 interface TaskFilterProps {
   tasks: Task[];
+  taskStatuses: TaskStatus[];
 }
 
-export function TaskFilter({ tasks }: TaskFilterProps) {
+export function TaskFilter({ tasks, taskStatuses }: TaskFilterProps) {
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
   const filteredTasks = tasks.filter((task) => {
     if (statusFilter === "all") return true;
-    return task.status === statusFilter;
+    return task.status.id === statusFilter;
   });
 
   return (
@@ -33,9 +35,11 @@ export function TaskFilter({ tasks }: TaskFilterProps) {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Tasks</SelectItem>
-            <SelectItem value="In Progress">In Progress</SelectItem>
-            <SelectItem value="Incomplete">Incomplete</SelectItem>
-            <SelectItem value="Done">Done</SelectItem>
+            {taskStatuses.map((taskStatus) => (
+              <SelectItem key={taskStatus.id} value={taskStatus.id}>
+                {taskStatus.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>

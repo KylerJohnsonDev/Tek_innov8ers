@@ -34,6 +34,28 @@ async function main() {
   const janeDoeUserId = signUpJaneDoeResult.user.id;
   console.log("Created user:", signUpJaneDoeResult.user);
 
+  // creating Task Statuses
+  const inProgressStatus = await prismaClient.taskStatus.create({
+    data: {
+      name: "In Progress",
+      sortOrder: 1,
+    },
+  })
+
+  const inCompleteStatus = await prismaClient.taskStatus.create({
+    data: {
+      name: "Incomplete",
+      sortOrder: 2,
+    },
+  })
+
+  const doneStatus = await prismaClient.taskStatus.create({
+    data: {
+      name: "Done",
+      sortOrder: 3,
+    },
+  })
+
   // Create demo projects with tasks
   const project1 = await prismaClient.project.create({
     data: {
@@ -45,17 +67,17 @@ async function main() {
           {
             title: "Design mockups",
             description: "Create initial design concepts and mockups",
-            status: "Done",
+            statusId: doneStatus.id,
           },
           {
             title: "Implement responsive layout",
             description: "Build responsive components for all screen sizes",
-            status: "In Progress",
+            statusId: inProgressStatus.id,
           },
           {
             title: "SEO optimization",
             description: "Optimize metadata and content for search engines",
-            status: "Incomplete",
+            statusId: inCompleteStatus.id,
           },
         ],
       },
@@ -72,22 +94,22 @@ async function main() {
           {
             title: "Setup development environment",
             description: "Configure React Native and required dependencies",
-            status: "Done",
+            statusId: doneStatus.id,
           },
           {
             title: "Build authentication flow",
             description: "Implement login, signup, and password reset",
-            status: "In Progress",
+            statusId: inProgressStatus.id,
           },
           {
             title: "Create user dashboard",
             description: "Design and implement main dashboard UI",
-            status: "In Progress",
+            statusId: inProgressStatus.id,
           },
           {
             title: "Integrate API endpoints",
             description: "Connect frontend to backend API",
-            status: "Incomplete",
+            statusId: inCompleteStatus.id,
           },
         ],
       },
@@ -104,12 +126,12 @@ async function main() {
           {
             title: "Review existing docs",
             description: "Audit current documentation for accuracy",
-            status: "Done",
+            statusId: doneStatus.id,
           },
           {
             title: "Write API documentation",
             description: "Document all REST API endpoints",
-            status: "Incomplete",
+            statusId: inCompleteStatus.id,
           },
         ],
       },

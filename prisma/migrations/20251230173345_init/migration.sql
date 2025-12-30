@@ -21,14 +21,22 @@ CREATE TABLE "Project" (
 );
 
 -- CreateTable
+CREATE TABLE "TaskStatus" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "name" TEXT NOT NULL,
+    "sortOrder" INTEGER NOT NULL
+);
+
+-- CreateTable
 CREATE TABLE "Task" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "title" TEXT NOT NULL,
     "description" TEXT,
-    "status" TEXT NOT NULL DEFAULT 'Incomplete',
+    "statusId" TEXT NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
     "projectId" TEXT NOT NULL,
+    CONSTRAINT "Task_statusId_fkey" FOREIGN KEY ("statusId") REFERENCES "TaskStatus" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT "Task_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -75,6 +83,9 @@ CREATE TABLE "verification" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "TaskStatus_name_key" ON "TaskStatus"("name");
 
 -- CreateIndex
 CREATE INDEX "session_userId_idx" ON "session"("userId");

@@ -2,12 +2,12 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Task } from "@/lib/services";
+import { TaskWithStatus } from "@/lib/services";
 import { EditTaskDialog } from "./edit-task-dialog";
 import { Circle, CircleDot, CheckCircle2 } from "lucide-react";
 
 interface TaskListProps {
-  tasks: Task[];
+  tasks: TaskWithStatus[];
 }
 
 export function TaskList({ tasks }: TaskListProps) {
@@ -62,7 +62,7 @@ export function TaskList({ tasks }: TaskListProps) {
                 )}
               </div>
               <div className="flex items-center gap-2">
-                {getStatusBadge(task.status)}
+                {getStatusBadge(task.status.name)}
                 <EditTaskDialog task={task} />
               </div>
             </div>

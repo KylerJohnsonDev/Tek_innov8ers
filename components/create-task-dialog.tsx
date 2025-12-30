@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { TaskStatus } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,12 +26,14 @@ import { Plus } from "lucide-react";
 
 interface CreateTaskDialogProps {
   projectId: string;
+  taskStatuses: TaskStatus[];
 }
 
-export function CreateTaskDialog({ projectId }: CreateTaskDialogProps) {
+export function CreateTaskDialog({ projectId, taskStatuses }: CreateTaskDialogProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [status, setStatus] = useState("Incomplete");
+  const defaultStatus = taskStatuses.find(s => s.name === "Incomplete");
+  const [status, setStatus] = useState(defaultStatus?.id || taskStatuses[0]?.id || "");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -43,7 +46,7 @@ export function CreateTaskDialog({ projectId }: CreateTaskDialogProps) {
     try {
       await createTaskAction(formData);
       setOpen(false);
-      setStatus("Incomplete");
+      setStatus(defaultStatus?.id || taskStatuses[0]?.id || "");
     } catch (error) {
       console.error("Failed to create task:", error);
     } finally {
@@ -99,9 +102,11 @@ export function CreateTaskDialog({ projectId }: CreateTaskDialogProps) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Incomplete">Incomplete</SelectItem>
-                  <SelectItem value="In Progress">In Progress</SelectItem>
-                  <SelectItem value="Done">Done</SelectItem>
+                  {taskStatuses.map((taskStatus) => (
+                    <SelectItem key={taskStatus.id} value={taskStatus.id}>
+                      {taskStatus.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

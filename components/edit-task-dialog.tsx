@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { TaskStatus } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,18 +20,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { updateTaskAction, deleteTaskAction } from "@/app/actions";
-import { Task } from "@/lib/services";
+import { updateTaskAction, deleteTaskAction, getTaskStatusesAction } from "@/app/actions";
+import { TaskWithStatus } from "@/lib/services";
 import { Pencil, Trash2 } from "lucide-react";
 
 interface EditTaskDialogProps {
-  task: Task;
+  task: TaskWithStatus;
 }
 
 export function EditTaskDialog({ task }: EditTaskDialogProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [status, setStatus] = useState(task.status);
+  const [taskStatuses, setTaskStatuses] = useState<TaskStatus[]>([]);
+  const [status, setStatus] = useState(task.status.id);
+
+  useEffect(() => {
+    getTaskStatusesAction().then(setTaskStatuses);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -115,9 +121,11 @@ export function EditTaskDialog({ task }: EditTaskDialogProps) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Incomplete">Incomplete</SelectItem>
-                  <SelectItem value="In Progress">In Progress</SelectItem>
-                  <SelectItem value="Done">Done</SelectItem>
+                  {taskStatuses.map((taskStatus) => (
+                    <SelectItem key={taskStatus.id} value={taskStatus.id}>
+                      {taskStatus.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

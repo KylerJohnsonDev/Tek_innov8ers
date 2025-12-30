@@ -8,11 +8,16 @@ import {
   updateTask,
   deleteTask,
   updateProject,
+  getAllTaskStatuses,
 } from "@/lib/services";
 import { revalidatePath } from "next/cache";
 
 export async function getProjectsAction(userId: string) {
   return await getAllProjects(userId);
+}
+
+export async function getTaskStatusesAction() {
+  return await getAllTaskStatuses();
 }
 
 export async function createProjectAction(formData: FormData) {
@@ -56,17 +61,17 @@ export async function deleteProjectAction(projectId: string) {
 export async function createTaskAction(formData: FormData) {
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
-  const status = formData.get("status") as string;
+  const statusId = formData.get("status") as string;
   const projectId = formData.get("projectId") as string;
 
-  if (!title || !projectId) {
-    throw new Error("Title and projectId are required");
+  if (!title || !projectId || !statusId) {
+    throw new Error("Title, projectId, and statusId are required");
   }
 
   const task = await createTask({
     title,
     description: description || undefined,
-    status: status || "Incomplete",
+    statusId,
     projectId,
   });
 
@@ -77,12 +82,12 @@ export async function createTaskAction(formData: FormData) {
 export async function updateTaskAction(taskId: string, formData: FormData) {
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
-  const status = formData.get("status") as string;
+  const statusId = formData.get("status") as string;
 
   const task = await updateTask(taskId, {
     title: title || undefined,
     description: description || undefined,
-    status: status || undefined,
+    statusId: statusId || undefined,
   });
 
   revalidatePath(`/projects/${task.projectId}`);

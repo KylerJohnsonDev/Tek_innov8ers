@@ -1,16 +1,60 @@
 import { prismaClient } from "./db";
-import { TaskStatus } from "@prisma/client";
+import { Prisma, TaskStatus } from "@prisma/client";
 import { removeUndefinedProperties } from "./utils";
 
-export async function searchProjects(userId: string, searchQuery: string): Promise<Project[]> {
-  const sql = `
-    SELECT id, title, description, createdAt, updatedAt, userId 
-    FROM Project 
-    WHERE userId = '${userId}' AND title LIKE '%${searchQuery}%'
-  `;
+export async function searchProjects(userId: string, searchQuery: string): Promise<ProjectWithTaskCount[]> {
+  // VULNERABLE CODE: prone to SQL injection
+  // const sql = `
+  //   SELECT id, title, description, createdAt, updatedAt, userId 
+  //   FROM Project 
+  //   WHERE userId = '${userId}' AND title LIKE '%${searchQuery}%'
+  // `;
+  // const results = await prismaClient.$queryRawUnsafe(sql);
+  // return results as Project[];
+
+  // SOLUTION 1: parameterized queries to prevent SQL injection
+  // type QueryResult = Project & { tasks: bigint };
   
-  const results = await prismaClient.$queryRawUnsafe(sql);
-  return results as Project[];
+  // const safeResults = await prismaClient.$queryRaw<QueryResult[]>`
+  //   SELECT 
+  //     p.id, 
+  //     p.title, 
+  //     p.description, 
+  //     p.createdAt, 
+  //     p.updatedAt, 
+  //     p.userId,
+  //     COUNT(t.id) as tasks
+  //   FROM Project p
+  //   LEFT JOIN Task t ON p.id = t.projectId
+  //   WHERE p.userId = ${userId} AND p.title LIKE ${`%${searchQuery}%`}
+  //   GROUP BY p.id, p.title, p.description, p.createdAt, p.updatedAt, p.userId`;
+  
+  // return safeResults.map(project => ({
+  //   id: project.id,
+  //   title: project.title,
+  //   description: project.description,
+  //   createdAt: project.createdAt,
+  //   updatedAt: project.updatedAt,
+  //   userId: project.userId,
+  //   _count: { tasks: Number(project.tasks) }
+  // }));
+
+  // SOLUTION 2: Using Prisma's ORM capabilities to avoid raw SQL
+  const projects = await prismaClient.project.findMany({
+    where: {
+      userId,
+      title: {
+        contains: searchQuery,
+      }
+    },
+    include: {
+      _count: {
+        select: { tasks: true }
+      }
+    }
+  });
+  return projects; 
+  
 }
 
 export type Project = {

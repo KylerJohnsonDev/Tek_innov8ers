@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { ProjectCard } from "./project-card";
-import { Project } from "@/lib/services";
+import { Project, ProjectWithTaskCount } from "@/lib/services";
 import { searchProjectsAction } from "@/app/actions";
 
 type ProjectSearchProps = {
@@ -14,7 +14,7 @@ type ProjectSearchProps = {
 
 export function ProjectSearch({ userId }: ProjectSearchProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<Project[]>([]);
+  const [searchResults, setSearchResults] = useState<ProjectWithTaskCount[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -78,7 +78,7 @@ export function ProjectSearch({ userId }: ProjectSearchProps) {
                 key={project.id}
                 project={{
                   ...project,
-                  _count: { tasks: 0 },
+                  _count: { tasks: project._count.tasks },
                 }}
               />
             ))}

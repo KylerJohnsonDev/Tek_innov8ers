@@ -35,6 +35,11 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     notFound();
   }
 
+  // Verify user owns this project
+  if (project.userId !== session.user.id) {
+    notFound();
+  }
+
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString("en-US", {
       month: "long",

@@ -182,6 +182,13 @@ export async function createTask(data: {
     data,
     include: { status: true },
   })
+  
+  // Update parent project's updatedAt timestamp
+  await prismaClient.project.update({
+    where: { id: data.projectId },
+    data: { updatedAt: new Date() }
+  });
+  
   return newTask;
 }
 
@@ -201,12 +208,34 @@ export async function updateTask(
   },
   include: { status: true }
  })
+ 
+ // Update parent project's updatedAt timestamp
+ await prismaClient.project.update({
+   where: { id: updatedTask.projectId },
+   data: { updatedAt: new Date() }
+ });
 
  return updatedTask;
 }
 
 export async function deleteTask(taskId: string): Promise<void> {
+  // Get task to access projectId before deleting
+  const task = await prismaClient.task.findUnique({
+    where: { id: taskId },
+    select: { projectId: true }
+  });
+  
+  if (!task) {
+    throw new Error('Task not found');
+  }
+  
   await prismaClient.task.delete({
     where: { id: taskId }
+  });
+  
+  // Update parent project's updatedAt timestamp
+  await prismaClient.project.update({
+    where: { id: task.projectId },
+    data: { updatedAt: new Date() }
   });
 }

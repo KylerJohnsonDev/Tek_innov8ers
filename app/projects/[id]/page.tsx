@@ -8,6 +8,7 @@ import { EditProjectDialog } from "@/components/edit-project-dialog";
 import { TaskFilter } from "@/components/task-filter";
 import { ArrowLeft, Calendar, Clock } from "lucide-react";
 import { auth } from "@/lib/auth";
+import { sanitizeHtml } from "@/lib/utils";
 import { headers } from "next/headers";
 
 interface ProjectPageProps {
@@ -63,7 +64,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 <CardTitle className="text-3xl">{project.title}</CardTitle>
                 <CardDescription className="text-base">
                   {project.description ? (
-                    <span dangerouslySetInnerHTML={{ __html: project.description }} />
+                    <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(project.description) }} />
                   ) : (
                     "No description provided"
                   )}

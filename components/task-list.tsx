@@ -5,6 +5,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/ca
 import { TaskWithStatus } from "@/lib/services";
 import { EditTaskDialog } from "./edit-task-dialog";
 import { Circle, CircleDot, CheckCircle2 } from "lucide-react";
+import { sanitizeHtml } from "@/lib/utils";
 
 interface TaskListProps {
   tasks: TaskWithStatus[];
@@ -57,7 +58,7 @@ export function TaskList({ tasks }: TaskListProps) {
                   <CardTitle className="">{task.title}</CardTitle>
                   {task.description && (
                     <CardDescription className="">
-                      <span dangerouslySetInnerHTML={{ __html: task.description }} />
+                      <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(task.description) }} />
                     </CardDescription>
                   )}
               </div>

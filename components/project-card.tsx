@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { ProjectWithTaskCount } from "@/lib/services";
 import { Calendar, Clock } from "lucide-react";
+import { sanitizeHtml } from "@/lib/utils";
 
 interface ProjectCardProps {
   project: ProjectWithTaskCount;
@@ -28,7 +29,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
               <CardTitle>{project.title}</CardTitle>
               <CardDescription className="line-clamp-2">
                 {project.description ? (
-                  <span dangerouslySetInnerHTML={{ __html: project.description }} />
+                  <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(project.description) }} />
                 ) : (
                   "No description"
                 )}
